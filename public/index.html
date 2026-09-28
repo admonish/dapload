@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dapload &middot; Shanling M1 Plus</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <!-- Icons: <svg data-icon="name"> placeholders are filled from ICONS in app.js. -->
+  <div id="drop-overlay">
+    <div class="drop-card">
+      <div class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="drop-title">Drop files or folders to upload</div>
+      <div id="drop-target" class="drop-target"></div>
+    </div>
+  </div>
+
+  <div id="offline-state" class="offline-state hidden">
+    <div class="offline-card">
+      <div class="readout offline-readout">
+        <span id="offline-led" class="led"></span>
+        <div class="readout-text">
+          <span id="offline-status" class="readout-main"></span>
+          <span id="offline-address" class="readout-sub"></span>
+        </div>
+      </div>
+      <div class="offline-copy">
+        <h2 id="offline-title">Can&rsquo;t reach your Shanling M1 Plus</h2>
+        <p id="offline-reachable-msg">Make sure <strong>WiFi Transfer</strong> is open on the device and that it&rsquo;s on the same network. If its address has changed, update it below.</p>
+        <p id="offline-setup-msg" class="hidden">Open <strong>WiFi Transfer</strong> on the player. It shows an address like <code>http://192.168.1.23:8888</code>. Enter it below.</p>
+      </div>
+      <form id="device-form" class="field">
+        <label for="device-input" class="caps-label">Device address</label>
+        <div class="device-form-row">
+          <input type="text" id="device-input" class="input mono" placeholder="e.g. 192.168.1.23:8888" autocomplete="off" spellcheck="false">
+          <button type="submit" id="device-save" class="btn">Save</button>
+        </div>
+      </form>
+      <div class="offline-retry-row">
+        <button id="offline-retry" class="btn btn-primary"><svg data-icon="refresh"></svg>Retry now</button>
+        <span id="offline-hint" class="offline-hint">Retrying automatically every few seconds&hellip;</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-main" class="shell hidden">
+    <aside class="side">
+      <div class="device-head">
+        <svg data-icon="device" class="device-icon"></svg>
+        <div class="device-id">
+          <h1>Shanling M1 Plus</h1>
+          <span class="device-status"><span class="led on"></span>Connected</span>
+        </div>
+      </div>
+
+      <div id="usage-badge" class="readout usage-badge hidden">
+        <div class="readout-text">
+          <span id="usage-text" class="readout-main">Calculating usage&hellip;</span>
+          <span id="usage-files" class="readout-sub"></span>
+        </div>
+        <button id="usage-refresh" class="readout-btn" title="Recalculate"><svg data-icon="refresh"></svg></button>
+      </div>
+
+      <div class="side-actions">
+        <button id="upload-btn" class="btn btn-primary side-primary"><svg data-icon="upload"></svg><span class="label">Upload files</span></button>
+        <button id="upload-folder-btn" class="side-action" title="Upload folder"><svg data-icon="folderUpload"></svg><span class="label">Upload folder</span></button>
+        <button id="add-library-btn" class="side-action" title="Add from library"><svg data-icon="library"></svg><span class="label">Add from library</span></button>
+        <button id="new-folder-btn" class="side-action" title="New folder"><svg data-icon="folderPlus"></svg><span class="label">New folder</span></button>
+        <input type="file" id="file-input" multiple hidden>
+        <input type="file" id="folder-input" webkitdirectory directory multiple hidden>
+      </div>
+
+      <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener" class="support-link"><svg data-icon="coffee"></svg>Support this project</a>
+
+      <div class="side-tools">
+        <button id="settings-btn" class="icon-btn" title="Device address"><svg data-icon="settings"></svg></button>
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme"><svg id="theme-icon" data-icon="moon"></svg></button>
+        <div class="spacer"></div>
+        <button id="refresh-btn" class="icon-btn" title="Refresh"><svg data-icon="refresh"></svg></button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="content-head">
+        <nav id="breadcrumb" class="breadcrumb"></nav>
+        <div class="title-row">
+          <button id="up-btn" class="btn btn-icon" title="Up one folder"><svg data-icon="up"></svg></button>
+          <div class="folder-title">
+            <h2 id="folder-title"></h2>
+            <span id="folder-count" class="folder-count"></span>
+          </div>
+          <div class="list-tools">
+            <label class="input-wrap filter-wrap">
+              <svg data-icon="search"></svg>
+              <input type="search" id="filter-input" class="input" placeholder="Filter this folder&hellip;">
+            </label>
+            <label class="input-wrap select-wrap">
+              <svg data-icon="sort"></svg>
+              <select id="sort-select" class="input" title="Sort">
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="name-asc">Name A&ndash;Z</option>
+                <option value="name-desc">Name Z&ndash;A</option>
+                <option value="size-desc">Largest first</option>
+                <option value="size-asc">Smallest first</option>
+              </select>
+              <svg data-icon="chevronDown" class="select-chevron"></svg>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="list-head" class="list-head grid-row">
+        <input type="checkbox" id="select-all" class="checkbox" title="Select all">
+        <span class="col-n">#</span>
+        <span></span>
+        <span>Name</span>
+        <span class="col-size">Size</span>
+        <span class="col-date">Added</span>
+        <span></span>
+      </div>
+
+      <div id="bulk-bar" class="bulk-bar hidden">
+        <input type="checkbox" id="bulk-all" class="checkbox" title="Select all">
+        <span id="bulk-count" class="bulk-count"></span>
+        <button id="bulk-clear-btn" class="btn btn-ghost">Clear selection</button>
+        <div class="spacer"></div>
+        <button id="bulk-delete-btn" class="btn btn-danger"><svg data-icon="trash"></svg>Delete selected</button>
+      </div>
+
+      <div class="list-scroll">
+        <div id="listing" class="listing"></div>
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-rule"></div>
+          <div id="empty-title" class="empty-title">This folder is empty.</div>
+          <div id="empty-hint">Drop files here, or use Upload files.</div>
+        </div>
+      </div>
+
+      <div id="upload-panel" class="dock hidden">
+        <div id="upload-list" class="dock-list"></div>
+        <div class="dock-bar">
+          <div class="dock-icon"><svg id="dock-icon" data-icon="upload"></svg></div>
+          <div class="dock-main">
+            <div class="dock-title">
+              <span id="upload-panel-header" class="dock-header">Transferring&hellip;</span>
+              <span id="upload-current" class="dock-current"></span>
+              <span id="dock-support" class="dock-support hidden">Enjoying Dapload? <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener">Buy me a coffee</a><button id="dock-support-dismiss" class="dock-support-dismiss" title="Don&rsquo;t show this again"><svg data-icon="x"></svg></button></span>
+            </div>
+            <div id="upload-progress-track" class="dock-progress">
+              <div id="upload-progress-fill" class="dock-progress-fill"></div>
+            </div>
+          </div>
+          <span id="upload-summary" class="dock-summary"></span>
+          <button id="dock-toggle" class="icon-btn" title="Collapse"><svg data-icon="chevronDown"></svg></button>
+          <button id="dock-close" class="icon-btn hidden" title="Close"><svg data-icon="x"></svg></button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal modal-small">
+      <div class="modal-content">
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-body" class="modal-body"></div>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn">Cancel</button>
+        <button id="modal-confirm" class="btn btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="library-modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal library-modal">
+      <div class="modal-head">
+        <svg data-icon="library" class="modal-head-icon"></svg>
+        <div id="library-modal-title" class="modal-title">Add from library</div>
+        <button id="library-settings-btn" class="link-btn hidden"><svg data-icon="settings"></svg>Connection settings</button>
+      </div>
+      <nav id="library-breadcrumb" class="breadcrumb library-breadcrumb"></nav>
+      <div id="library-listing" class="library-listing"></div>
+      <div id="library-error" class="library-error hidden"></div>
+      <div class="modal-actions">
+        <span id="library-selected-count" class="library-selected-count"></span>
+        <button id="library-cancel" class="btn">Cancel</button>
+        <button id="library-copy-btn" class="btn btn-primary" disabled>Copy here</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="library-setup-backdrop" class="modal-backdrop hidden">
+    <form id="library-setup-form" class="modal library-setup" autocomplete="off">
+      <div class="modal-head">
+        <svg data-icon="nas" class="modal-head-icon"></svg>
+        <div class="modal-title">Connect a music library</div>
+      </div>
+      <div class="modal-content">
+        <p class="setup-intro">Copy music from a NAS or shared network folder straight to your player. Files go directly from the share to the player without passing through this browser.</p>
+        <div id="library-setup-unavailable" class="form-error hidden"><svg data-icon="alert"></svg><span>This server can&rsquo;t connect to network shares yet. Whoever set it up needs to install the <code>smbprotocol</code> Python package, or use the Docker image, which includes it.</span></div>
+        <label class="field">
+          <span class="caps-label">Network share</span>
+          <input type="text" id="ls-address" class="input mono" placeholder="\\nas\music" spellcheck="false" required>
+          <small>The address you&rsquo;d type in Windows File Explorer, e.g. <code>\\nas\music</code> or <code>\\192.168.1.10\music\FLAC</code>. On a Mac, <code>smb://nas/music</code> also works.</small>
+        </label>
+        <div class="field-row">
+          <label class="field"><span class="caps-label">Username</span><input type="text" id="ls-username" class="input" spellcheck="false"></label>
+          <label class="field"><span class="caps-label">Password</span>
+            <span class="input-wrap password-wrap">
+              <input type="password" id="ls-password" class="input" autocomplete="new-password">
+              <button type="button" id="ls-password-toggle" class="reveal-btn" title="Show password"><svg data-icon="eye"></svg></button>
+            </span>
+          </label>
+        </div>
+        <label class="field"><span class="caps-label">Show it as</span><input type="text" id="ls-name" class="input" placeholder="NAS"></label>
+        <div id="library-setup-error" class="form-error hidden"><svg data-icon="alert"></svg><span id="library-setup-error-text"></span></div>
+        <p class="setup-footnote">The share is only read, never changed. The password is saved on the server running this app. Anyone who can open this page can browse the share, so only use this on a network you trust.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="ls-remove" class="btn btn-ghost btn-ghost-danger hidden">Disconnect</button>
+        <div class="spacer"></div>
+        <button type="button" id="ls-cancel" class="btn">Cancel</button>
+        <button type="submit" id="ls-connect" class="btn btn-primary">Connect</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
