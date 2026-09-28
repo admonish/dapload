@@ -24,7 +24,7 @@ const d = (p) => join(dist, p);
 
 rmSync(dist, { recursive: true, force: true });
 cpSync(join(root, "site"), dist, { recursive: true });
-for (const f of ["README.md", "build.mjs"]) rmSync(d(f), { force: true });
+for (const f of ["README.md", "build.mjs", "og"]) rmSync(d(f), { recursive: true, force: true }); // og/ is the image source
 mkdirSync(d("demo/app"), { recursive: true });
 for (const f of ["index.html", "app.css", "app.js"]) cpSync(join(root, "public", f), d(`demo/app/${f}`));
 

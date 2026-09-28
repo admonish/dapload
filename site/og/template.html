@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+  Source for og.png, the 1200x630 image shown when dapload.com is shared
+  (og:image / twitter:image). Not deployed: site/build.mjs leaves site/og/ out.
+
+  To regenerate after changing the look, from the repo root:
+    node site/og/render.mjs
+  It screenshots this page with Playwright + Chromium. Install the Inter
+  font first (https://rsms.me/inter/); it stands in for the system fonts
+  the live site uses.
+-->
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../site.css">
+<style>
+  :root { --sans: "Inter Variable", Inter, -apple-system, "Segoe UI", system-ui, sans-serif; }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: var(--sans);
+    background:
+      radial-gradient(900px 500px at 88% 45%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+      var(--bg);
+  }
+  .og { display: grid; grid-template-columns: 1fr 520px; align-items: center; gap: 24px; height: 100%; padding: 0 64px 0 76px; box-sizing: border-box; }
+  .og-brand { display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 700; letter-spacing: -.01em; }
+  .og-brand .led { width: 12px; height: 12px; }
+  .og-caps { margin-top: 38px; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .og h1 { margin: 14px 0 0; font-size: 56px; line-height: 1.04; letter-spacing: -.035em; font-weight: 750; }
+  .og-points { margin-top: 26px; display: flex; flex-direction: column; gap: 9px; font-size: 20px; color: var(--muted); }
+  .og-points span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin: 0 12px 3px 0; }
+  .og-url { margin-top: 36px; font-family: var(--mono); font-size: 19px; color: var(--display-ink); }
+  .og .hero-visual { min-height: 0; zoom: 1.02; }
+</style>
+</head>
+<body>
+<div class="og">
+  <div>
+    <div class="og-brand"><span class="led on"></span>Dapload</div>
+    <div class="og-caps">For the Shanling M1 Plus · Free &amp; open source</div>
+    <h1>A better WiFi Transfer for your player</h1>
+    <div class="og-points">
+      <span>Upload whole folders</span>
+      <span>Pick up where a batch stopped</span>
+      <span>Copy albums straight from your NAS</span>
+    </div>
+    <div class="og-url">dapload.com</div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="player">
+      <div class="player-glass">
+        <div class="player-screen readout">
+          <div class="ps-top"><span class="led on"></span>WiFi Transfer</div>
+          <div class="ps-title">Open in a browser</div>
+          <div class="ps-addr">http://192.168.1.23:8888</div>
+          <div class="ps-sub">Keep this screen open while transferring</div>
+        </div>
+      </div>
+      <div class="player-wheel"></div>
+      <div class="player-btns"><span></span><span></span><span></span></div>
+    </div>
+    <div class="link-wire"><span>WiFi</span></div>
+    <div class="mini-side">
+      <div class="mini-head">
+        <svg data-icon="device"></svg>
+        <div><b>Shanling M1 Plus</b><small><span class="led on"></span>Connected</small></div>
+      </div>
+      <div class="readout mini-readout"><b>≈ 118.42 GB used</b><small>9,212 files</small></div>
+      <div class="mini-actions">
+        <span class="btn btn-primary"><svg data-icon="upload"></svg>Upload files</span>
+        <div><svg data-icon="folderUpload"></svg>Upload folder</div>
+        <div><svg data-icon="library"></svg>Add from NAS</div>
+        <div><svg data-icon="folderPlus"></svg>New folder</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // The few icons the picture needs, same paths as ICONS in site.js.
+  const FOLDER = "M3 6.5A1.5 1.5 0 0 1 4.5 5h4.3l2 2.2h8.7A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z";
+  const ICONS = {
+    device: "M7.5 2.5h9A1.5 1.5 0 0 1 18 4v16a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V4A1.5 1.5 0 0 1 7.5 2.5z M9 5.5h6v5H9z M14.5 16.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0",
+    upload: "M12 15V4 M7 9l5-5 5 5 M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4",
+    folderUpload: FOLDER + " M12 17v-6 M9.5 13.5 12 11l2.5 2.5",
+    library: "M12 21a9 9 0 1 1 0-18a9 9 0 1 1 0 18z M12 14.5a2.5 2.5 0 1 1 0-5a2.5 2.5 0 1 1 0 5z",
+    folderPlus: FOLDER + " M12 11v6 M9 14h6",
+  };
+  for (const svg of document.querySelectorAll("svg[data-icon]")) {
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.innerHTML = `<path d="${ICONS[svg.dataset.icon]}"/>`;
+  }
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ demo/index.html       full-screen demo (dapload.com/demo/)
 demo/demo-host.js     loads the real app into an iframe with the mock injected
 demo/mock-backend.js  in-browser stand-in for proxy.py, the player and the NAS
 build.mjs             builds the site into dist/ (Node, no dependencies)
+og.png                1200x630 link-preview image (og:image), rendered from og/template.html by og/render.mjs; og/ isn't deployed
 ```
 
 ## Building and deploying
