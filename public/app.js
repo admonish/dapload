@@ -722,7 +722,29 @@ const SEGMENT_LIMIT = 40; // up to this many files, the progress bar has one seg
 let dockStats = null;
 let dockHideTimer = null;
 
+// Shown while a library copy is still listing folders, before transferEntries()
+// knows how many files there are.
+let dockScanning = false;
+function showDockScanning(name) {
+  clearTimeout(dockHideTimer);
+  dockScanning = true;
+  uploadList.innerHTML = "";
+  setIcon($("#dock-icon"), "library");
+  $("#dock-close").classList.add("hidden");
+  $("#dock-toggle").classList.add("hidden");
+  $("#dock-support").classList.add("hidden");
+  $("#upload-summary").textContent = "";
+  uploadProgressTrack.classList.remove("segmented");
+  uploadProgressTrack.querySelectorAll(".seg").forEach((el) => el.remove());
+  uploadProgressTrack.classList.add("scanning");
+  setUploadHeader(`Scanning ${name}…`, "Looking for files to copy");
+  uploadPanel.classList.remove("hidden");
+  syncDockHeight();
+}
+
 function resetDock(total, iconName) {
+  dockScanning = false;
+  uploadProgressTrack.classList.remove("scanning");
   clearTimeout(dockHideTimer);
   uploadList.innerHTML = "";
   setIcon($("#dock-icon"), iconName);
@@ -772,6 +794,8 @@ function syncDockHeight() {
 if (window.ResizeObserver) new ResizeObserver(syncDockHeight).observe(uploadPanel);
 
 function hideDock() {
+  dockScanning = false;
+  uploadProgressTrack.classList.remove("scanning");
   clearTimeout(dockHideTimer);
   uploadPanel.classList.add("hidden");
   syncDockHeight();
@@ -1072,6 +1096,9 @@ async function apiLibraryList(relPath) {
 
 function openLibraryModal() {
   librarySelected.clear();
+  // Don't show the previous visit's folder while the top level loads.
+  $("#library-listing").innerHTML = "";
+  $("#library-breadcrumb").innerHTML = "";
   updateLibrarySelectedCount();
   $("#library-modal-backdrop").classList.remove("hidden");
   navigateLibrary("");
@@ -1173,14 +1200,16 @@ function updateLibrarySelectedCount() {
 // Recursively walks a library folder via /library/list, preserving structure --
 // mirrors collectDroppedEntries but reads from the library folder instead of
 // the browser's drag-and-drop entries API.
-async function collectLibraryEntries(relPath, prefix) {
+// onFile() is called for each file found, to show scanning progress.
+async function collectLibraryEntries(relPath, prefix, onFile) {
   const listing = await apiLibraryList(relPath);
   const results = [];
   for (const entry of listing) {
     if (entry.size == null) {
-      results.push(...(await collectLibraryEntries(entry.path, prefix + entry.name + "/")));
+      results.push(...(await collectLibraryEntries(entry.path, prefix + entry.name + "/", onFile)));
     } else {
       results.push({ srcRel: entry.path, relativePath: prefix + entry.name, name: entry.name, size: Number(entry.size) });
+      onFile();
     }
   }
   return results;
@@ -1201,15 +1230,31 @@ $("#library-copy-btn").addEventListener("click", async () => {
   const picks = Array.from(librarySelected.values());
   closeLibraryModal();
 
+  // Walking big folders on a slow NAS takes a while, so say so in the dock
+  // (unless another batch is already using it).
+  const scanning = transfersInProgress === 0;
+  let found = 0;
+  const onFile = () => { if (scanning) setUploadHeader(`Scanning ${config.library.name}…`, `${++found} files found`); };
+  if (scanning) showDockScanning(config.library.name);
+
   const entries = [];
-  for (const entry of picks) {
-    if (entry.size == null) {
-      entries.push(...(await collectLibraryEntries(entry.path, entry.name + "/")));
-    } else {
-      entries.push({ srcRel: entry.path, relativePath: entry.name, name: entry.name, size: Number(entry.size) });
+  try {
+    for (const entry of picks) {
+      if (entry.size == null) {
+        entries.push(...(await collectLibraryEntries(entry.path, entry.name + "/", onFile)));
+      } else {
+        entries.push({ srcRel: entry.path, relativePath: entry.name, name: entry.name, size: Number(entry.size) });
+        onFile();
+      }
     }
+  } catch (e) {
+    if (dockScanning) hideDock();
+    toast(`Could not read ${config.library.name}: ${e.message}`, true);
+    return;
   }
   await processLibraryEntries(entries);
+  // Nothing was transferable (e.g. only unsupported files), so the dock was never reset.
+  if (dockScanning) hideDock();
 });
 
 // ---------- library setup (SMB share) ----------

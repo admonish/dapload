@@ -1,0 +1,9 @@
+# Only site/ and public/ are needed to build the website.
+CLAUDE.local.md
+shanling.html
+*.zip
+data/
+dist/
+__pycache__/
+.env*
+.vercel/

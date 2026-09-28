@@ -7,11 +7,12 @@ services:
     restart: unless-stopped
     ports:
       - "8899:8899"
-    environment:
-      # Optional. You can also enter (and later change) the address in the web UI.
+    # Optional settings. To use any of them, uncomment "environment:" too.
+    # environment:
+      # You can also enter (and later change) the player's address in the web UI.
       # DEVICE: "192.168.1.23:8888"
 
-      # Optional. You can connect a NAS from the web page instead. Use these only to
+      # You can connect a NAS from the web page instead. Use these only to
       # serve a folder on this machine (e.g. an NFS mount) as the library.
       # LIBRARY_DIR: "/music"
       # LIBRARY_NAME: "NAS"

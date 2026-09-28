@@ -1,3 +1,10 @@
 data/
 __pycache__/
 CLAUDE.local.md
+dist/
+site/demo/app/
+.vercel
+.env*
+# Design exports kept locally (the mockup contains private details)
+/shanling.html
+*.zip
