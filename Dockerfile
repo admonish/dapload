@@ -2,7 +2,7 @@
 # wheels for armv7, so compile wheels here where gcc is available.
 FROM python:3.12-slim AS build
 RUN apt-get update \
- && apt-get install -y --no-install-recommends gcc libffi-dev \
+ && apt-get install -y --no-install-recommends gcc libc6-dev libffi-dev \
  && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
