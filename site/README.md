@@ -39,4 +39,4 @@ These are all in `mock-backend.js`. None of them change the app files.
 
 ## Privacy
 
-The demo only ever reads `file.name` and `file.size`. Its state is kept in `sessionStorage` under `dapload-demo-state-v1`, and it makes no network requests apart from loading its own files. The site itself has no analytics and loads nothing from third parties.
+The demo only ever reads `file.name` and `file.size`. Its state is kept in `sessionStorage` under `dapload-demo-state-v1`, and it makes no network requests apart from loading its own files. The site itself uses Vercel Web Analytics and Speed Insights (cookieless, loaded from `/_vercel/` on the same domain; the `<script>` tags are at the end of both pages). They only work on the Vercel deployment and 404 harmlessly in a local preview. Nothing is loaded from third parties, and the app itself has no analytics.
