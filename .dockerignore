@@ -1,5 +1,6 @@
 # The image only needs requirements.txt, proxy.py and public/.
 site/
+api/
 dist/
 docs/
 *.md

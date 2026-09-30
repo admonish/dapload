@@ -37,6 +37,10 @@ These are all in `mock-backend.js`. None of them change the app files.
 - `scrollIntoView()`: inside an iframe this also scrolls the page around it, so the site jumped whenever the transfer dock added a row. The mock replaces it inside the demo document so it only scrolls the dock's own list.
 - The demo's theme is switched by calling the app's global `setTheme()`, and "Simulate player going offline" calls the global `refresh()` so the offline screen appears straight away. Going back online is left to the app's own 5-second retry.
 
+## Health check
+
+`/api/health` (`api/health.mjs` at the repo root, the only Vercel function) is for uptime monitoring with Better Stack. It follows the format shared by all our sites: `{"ok": true, "checks": {}, "version": "<commit>"}`, 200 when every check passes and 503 otherwise, with `Cache-Control: no-store` and no error details. The site has no backend dependencies, so `checks` is empty and a 200 proves the deployment serves functions. `version` is `VERCEL_GIT_COMMIT_SHA` shortened to 7 characters. The project isn't connected to GitHub, so deploys have to pass it with `--env VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD)`, or it reads `local`.
+
 ## Privacy
 
 The demo only ever reads `file.name` and `file.size`. Its state is kept in `sessionStorage` under `dapload-demo-state-v1`, and it makes no network requests apart from loading its own files. The site itself uses Vercel Web Analytics and Speed Insights (cookieless, loaded from `/_vercel/` on the same domain; the `<script>` tags are at the end of both pages). They only work on the Vercel deployment and 404 harmlessly in a local preview. Nothing is loaded from third parties, and the app itself has no analytics.
