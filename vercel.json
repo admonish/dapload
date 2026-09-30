@@ -4,7 +4,7 @@
   "installCommand": "",
   "buildCommand": "node site/build.mjs",
   "outputDirectory": "dist",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- site public api vercel.json",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- site public vercel.json",
   "headers": [
     {
       "source": "/(.*)",

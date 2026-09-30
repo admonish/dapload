@@ -1,4 +1,4 @@
-# Only site/, public/ and api/ are needed to build the website.
+# Only site/ and public/ are needed to build the website.
 CLAUDE.local.md
 shanling.html
 *.zip

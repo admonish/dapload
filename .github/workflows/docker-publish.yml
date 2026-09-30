@@ -7,7 +7,6 @@ on:
     # Website and docs changes don't affect the image.
     paths-ignore:
       - "site/**"
-      - "api/**"
       - "vercel.json"
       - ".vercelignore"
       - "docs/**"
