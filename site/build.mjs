@@ -13,10 +13,14 @@
 // Every replacement is checked, so if a page's markup changes and a
 // reference no longer matches, the build fails instead of silently
 // shipping an unversioned file.
+//
+// 4. Checks the custom analytics events in the pages against analytics.mjs
+//    and writes dist/analytics-events.json from it.
 import { createHash } from "node:crypto";
 import { cpSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { checkMarkup, manifest } from "./analytics.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -24,7 +28,7 @@ const d = (p) => join(dist, p);
 
 rmSync(dist, { recursive: true, force: true });
 cpSync(join(root, "site"), dist, { recursive: true });
-for (const f of ["README.md", "build.mjs", "og"]) rmSync(d(f), { recursive: true, force: true }); // og/ is the image source
+for (const f of ["README.md", "build.mjs", "analytics.mjs", "og"]) rmSync(d(f), { recursive: true, force: true }); // og/ is the image source
 mkdirSync(d("demo/app"), { recursive: true });
 for (const f of ["index.html", "app.css", "app.js"]) cpSync(join(root, "public", f), d(`demo/app/${f}`));
 
@@ -67,4 +71,10 @@ rewrite("demo/app/index.html", [
 ]);
 
 rmSync(d("site.css")); // inlined everywhere, nothing links to it any more
+
+// 4. Custom analytics events: every data-event element must match analytics.mjs, and the manifest for the
+//    owner's dashboard is written from the same definitions.
+const tracked = ["index.html", "demo/index.html"].flatMap((p) => checkMarkup(p, readFileSync(d(p), "utf8")));
+if (tracked.length !== 18 + 4) throw new Error(`expected 22 tracked elements, found ${tracked.length}; update build.mjs if that's on purpose`);
+writeFileSync(d("analytics-events.json"), JSON.stringify(manifest(), null, 2) + "\n");
 console.log("Built dist/", v);

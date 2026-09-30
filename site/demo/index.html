@@ -28,11 +28,11 @@
 <body class="demo-page">
   <div class="strip" role="toolbar" aria-label="Demo controls">
     <a class="brand" href="../"><span id="demo-url-led" class="led on" aria-hidden="true"></span>Dapload</a>
-    <button id="demo-reset" class="btn btn-sm" type="button"><svg data-icon="reset"></svg>Reset</button>
-    <button id="demo-offline" class="btn btn-sm" type="button" aria-pressed="false"><svg data-icon="power"></svg><span>Simulate player going offline</span></button>
+    <button id="demo-reset" class="btn btn-sm" type="button" data-event="demo_used" data-event-control="reset"><svg data-icon="reset"></svg>Reset</button>
+    <button id="demo-offline" class="btn btn-sm" type="button" aria-pressed="false" data-event="demo_used" data-event-control="offline"><svg data-icon="power"></svg><span>Simulate player going offline</span></button>
     <div class="seg" role="group" aria-label="Demo theme">
-      <button id="demo-light" type="button" aria-pressed="true" aria-label="Light"><svg data-icon="sun"></svg></button>
-      <button id="demo-dark" type="button" aria-pressed="false" aria-label="Dark"><svg data-icon="moon"></svg></button>
+      <button id="demo-light" type="button" aria-pressed="true" aria-label="Light" data-event="demo_used" data-event-control="theme"><svg data-icon="sun"></svg></button>
+      <button id="demo-dark" type="button" aria-pressed="false" aria-label="Dark" data-event="demo_used" data-event-control="theme"><svg data-icon="moon"></svg></button>
     </div>
     <div class="spacer"></div>
     <span class="strip-note">Demo: files stay in your browser, only names and sizes are kept.</span>

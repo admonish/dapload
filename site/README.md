@@ -5,7 +5,8 @@ Static site for Dapload. Plain HTML, CSS and JS. It lives in the same repo as th
 ```
 index.html            landing page
 site.css              styles (colour tokens copied from public/app.css)
-site.js               icons, theme toggle, install tabs, copy buttons, demo controls
+site.js               icons, theme toggle, install tabs, copy buttons, demo controls, analytics events
+analytics.mjs         the custom analytics events and funnels (source of /analytics-events.json)
 demo/index.html       full-screen demo (dapload.com/demo/)
 demo/demo-host.js     loads the real app into an iframe with the mock injected
 demo/mock-backend.js  in-browser stand-in for proxy.py, the player and the NAS
@@ -19,6 +20,7 @@ og.png                1200x630 link-preview image (og:image), rendered from og/t
 
 - It copies this folder, and adds the current `public/index.html`, `app.css` and `app.js` as `dist/demo/app/`. `demo-host.js` fetches `demo/app/index.html`, adds a `<base href>` and a `<script>` for `mock-backend.js` right after `<head>`, and loads the result with `iframe.srcdoc`. `site/demo/app/` is gitignored so a stale copy can't be committed.
 - It inlines `site.css` into both pages, so the first paint doesn't wait for a second request.
+- It checks every `data-event` element in both pages against `analytics.mjs` (see below) and writes `/analytics-events.json`.
 - It adds `?v=<content hash>` to every CSS and JS URL, including in the dist copy of the app's `index.html`. `vercel.json` caches URLs that have `?v` for a year, and HTML is revalidated on every visit, so a deploy shows up at once. The build fails if a reference it expects to rewrite is missing, so keep the `<link>`/`<script>` tags in the pages as they are, or update `build.mjs` along with them.
 
 Vercel runs the same script (`vercel.json` at the repo root) and skips deploys for commits that change nothing under `site/` or `public/`. To preview locally, run the build and serve `dist/` over http, e.g. `python3 -m http.server -d dist`. It has to be http(s), because the demo loads the app with `fetch()`, which doesn't work from `file://`.
@@ -44,3 +46,7 @@ These are all in `mock-backend.js`. None of them change the app files.
 ## Privacy
 
 The demo only ever reads `file.name` and `file.size`. Its state is kept in `sessionStorage` under `dapload-demo-state-v1`, and it makes no network requests apart from loading its own files. The site itself uses Vercel Web Analytics and Speed Insights (cookieless, loaded from `/_vercel/` on the same domain; the `<script>` tags are at the end of both pages). They only work on the Vercel deployment and 404 harmlessly in a local preview. Nothing is loaded from third parties, and the app itself has no analytics.
+
+### Custom analytics events
+
+`analytics.mjs` lists the events and funnels: `demo_used` (the first demo interaction in a page view), `install_copied` (a Copy button in Install) and `github_clicked`, with the funnel `demo_to_install`. The owner's analytics dashboard reads them from `/analytics-events.json`, which the build writes from the same file. To track a click, add `data-event="<name>"` and `data-event-<prop>="<value>"` to the element; `site.js` sends it through `window.va`, and the build fails if the event, property or value isn't in `analytics.mjs` (or if the number of tracked elements changes without updating the count in `build.mjs`). The first click inside the demo app is sent from `site.js` (`demo.onLoad`). Never rename an event or property; add a new one instead. Every event and funnel needs a short `label`, which the dashboard shows.

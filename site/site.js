@@ -1,7 +1,29 @@
-/* dapload.com site script: icons, theme, install tabs, copy buttons and
-   the demo controls. No dependencies. */
+/* dapload.com site script: icons, theme, install tabs, copy buttons, the
+   demo controls and custom analytics events. No dependencies. */
 (function () {
   "use strict";
+
+  // ---------- analytics events (declared in analytics.mjs) ----------
+  // A click on an element with data-event="name" sends that event, with its
+  // data-event-<prop> attributes as properties. The build checks every
+  // data-event element against analytics.mjs. window.va queues events until
+  // Vercel's deferred /_vercel/insights/script.js loads and sends them.
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  let demoTracked = false;
+  function track(name, data) {
+    // demo_used counts page views where the demo was tried, so only the first one is sent.
+    if (name === "demo_used") { if (demoTracked) return; demoTracked = true; }
+    window.va("event", { name: name, data: data });
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest && e.target.closest("[data-event]");
+    if (!t) return;
+    const data = {};
+    for (const k in t.dataset) {
+      if (k.length > 5 && k.startsWith("event")) data[k.slice(5).replace(/[A-Z]/g, (c) => "_" + c.toLowerCase()).replace(/^_/, "")] = t.dataset[k];
+    }
+    track(t.dataset.event, data);
+  }, true);
 
   // Same stroke icons as ICONS in public/app.js, plus a few for the site.
   const FOLDER = "M3 6.5A1.5 1.5 0 0 1 4.5 5h4.3l2 2.2h8.7A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z";
@@ -158,6 +180,10 @@
     demo.onLoad(() => {
       const l = $("demo-loading");
       if (l) l.classList.add("hidden");
+      // The demo is a same-origin srcdoc iframe, so its first click can be counted here.
+      try {
+        frameEl.contentDocument.addEventListener("pointerdown", () => track("demo_used", { control: "app" }), { once: true, capture: true });
+      } catch (err) { /* ignore */ }
       paintDemoTheme();
       paintOffline();
     });

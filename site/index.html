@@ -56,7 +56,7 @@
       <a href="#faq">FAQ</a>
     </nav>
     <div class="topbar-tools">
-      <a class="btn btn-sm" href="https://github.com/admonish/dapload"><svg data-icon="code"></svg>GitHub</a>
+      <a class="btn btn-sm" href="https://github.com/admonish/dapload" data-event="github_clicked" data-event-from="header"><svg data-icon="code"></svg>GitHub</a>
       <button id="theme-toggle" class="icon-btn" type="button"><svg data-icon="moon"></svg></button>
     </div>
   </div>
@@ -149,18 +149,18 @@
     </div>
 
     <div class="demo-bar" role="toolbar" aria-label="Demo controls">
-      <button id="demo-reset" class="btn btn-sm" type="button"><svg data-icon="reset"></svg>Reset demo</button>
-      <button id="demo-offline" class="btn btn-sm" type="button" aria-pressed="false"><svg data-icon="power"></svg><span>Simulate player going offline</span></button>
+      <button id="demo-reset" class="btn btn-sm" type="button" data-event="demo_used" data-event-control="reset"><svg data-icon="reset"></svg>Reset demo</button>
+      <button id="demo-offline" class="btn btn-sm" type="button" aria-pressed="false" data-event="demo_used" data-event-control="offline"><svg data-icon="power"></svg><span>Simulate player going offline</span></button>
       <div class="spacer"></div>
       <div class="seg" role="group" aria-label="Demo theme">
-        <button id="demo-light" type="button" aria-pressed="true"><svg data-icon="sun"></svg>Light</button>
-        <button id="demo-dark" type="button" aria-pressed="false"><svg data-icon="moon"></svg>Dark</button>
+        <button id="demo-light" type="button" aria-pressed="true" data-event="demo_used" data-event-control="theme"><svg data-icon="sun"></svg>Light</button>
+        <button id="demo-dark" type="button" aria-pressed="false" data-event="demo_used" data-event-control="theme"><svg data-icon="moon"></svg>Dark</button>
       </div>
       <div class="seg only-wide" role="group" aria-label="Demo width">
-        <button id="demo-desktop" type="button" aria-pressed="true"><svg data-icon="monitor"></svg>Desktop</button>
-        <button id="demo-phone" type="button" aria-pressed="false"><svg data-icon="phone"></svg>Phone</button>
+        <button id="demo-desktop" type="button" aria-pressed="true" data-event="demo_used" data-event-control="view"><svg data-icon="monitor"></svg>Desktop</button>
+        <button id="demo-phone" type="button" aria-pressed="false" data-event="demo_used" data-event-control="view"><svg data-icon="phone"></svg>Phone</button>
       </div>
-      <a class="btn btn-sm" href="demo/"><svg data-icon="external"></svg>Full screen</a>
+      <a class="btn btn-sm" href="demo/" data-event="demo_used" data-event-control="full_screen"><svg data-icon="external"></svg>Full screen</a>
     </div>
 
     <div id="demo-frame" class="frame">
@@ -268,7 +268,7 @@
 
         <div class="tab-panel" id="panel-docker" role="tabpanel" aria-labelledby="tab-docker">
           <div class="code">
-            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-docker"><svg data-icon="copy"></svg><span>Copy</span></button></div>
+            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-docker" data-event="install_copied" data-event-method="docker"><svg data-icon="copy"></svg><span>Copy</span></button></div>
 <pre id="code-docker"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
   -p 8899:8899 \
   -v dapload-data:/data \
@@ -280,7 +280,7 @@
             <div class="more-body">
               <p>If the music is on the machine running the app, or you’ve already mounted the share there, point the app at the folder. This also works for NFS shares.</p>
               <div class="code">
-                <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-local"><svg data-icon="copy"></svg><span>Copy</span></button></div>
+                <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-local" data-event="install_copied" data-event-method="docker_local"><svg data-icon="copy"></svg><span>Copy</span></button></div>
 <pre id="code-local"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
   -p 8899:8899 \
   -v dapload-data:/data \
@@ -296,7 +296,7 @@
 
         <div class="tab-panel" id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" hidden>
           <div class="code">
-            <div class="code-head">docker-compose.yml<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose"><svg data-icon="copy"></svg><span>Copy</span></button></div>
+            <div class="code-head">docker-compose.yml<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose" data-event="install_copied" data-event-method="compose"><svg data-icon="copy"></svg><span>Copy</span></button></div>
 <pre id="code-compose">services:
   dapload:
     image: ghcr.io/admonish/dapload:latest
@@ -323,7 +323,7 @@ volumes:
   dapload-data:</pre>
           </div>
           <div class="code">
-            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose-up"><svg data-icon="copy"></svg><span>Copy</span></button></div>
+            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose-up" data-event="install_copied" data-event-method="compose_up"><svg data-icon="copy"></svg><span>Copy</span></button></div>
 <pre id="code-compose-up"><span class="p">$ </span>docker compose up -d</pre>
           </div>
           <div class="arch">Images for <span class="chip">amd64</span><span class="chip">arm64</span><span class="chip">armv7</span></div>
@@ -332,7 +332,7 @@ volumes:
         <div class="tab-panel" id="panel-python" role="tabpanel" aria-labelledby="tab-python" hidden>
           <p>You need Python 3.8 or newer.</p>
           <div class="code">
-            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-python"><svg data-icon="copy"></svg><span>Copy</span></button></div>
+            <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-python" data-event="install_copied" data-event-method="python"><svg data-icon="copy"></svg><span>Copy</span></button></div>
 <pre id="code-python"><span class="p">$ </span>git clone https://github.com/admonish/dapload.git
 <span class="p">$ </span>cd dapload
 <span class="p">$ </span>pip install -r requirements.txt   <span class="c"># optional, only needed for connecting a NAS</span>
@@ -392,7 +392,7 @@ volumes:
     <div class="faq">
       <details>
         <summary>Does it work with my player?<svg data-icon="chevronDown"></svg></summary>
-        <div class="answer"><p>It’s tested on the Shanling M1 Plus. Other Shanling players with WiFi Transfer probably use the same server software and may work. If you try one, please <a href="https://github.com/admonish/dapload/issues">open an issue</a> saying whether it worked.</p></div>
+        <div class="answer"><p>It’s tested on the Shanling M1 Plus. Other Shanling players with WiFi Transfer probably use the same server software and may work. If you try one, please <a href="https://github.com/admonish/dapload/issues" data-event="github_clicked" data-event-from="faq">open an issue</a> saying whether it worked.</p></div>
       </details>
       <details>
         <summary>Is my music uploaded anywhere?<svg data-icon="chevronDown"></svg></summary>
@@ -441,10 +441,10 @@ volumes:
       <p>Made by Thomas. Free and ad-free. If it’s worth something to you, you can <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener">buy me a coffee</a>.</p>
     </div>
     <div class="foot-links">
-      <a href="https://github.com/admonish/dapload"><svg data-icon="code"></svg>GitHub</a>
-      <a href="https://github.com/admonish/dapload/issues"><svg data-icon="alert"></svg>Report an issue</a>
-      <a href="https://github.com/admonish/dapload/blob/main/LICENSE"><svg data-icon="shield"></svg>MIT License</a>
-      <a href="demo/"><svg data-icon="external"></svg>Demo, full screen</a>
+      <a href="https://github.com/admonish/dapload" data-event="github_clicked" data-event-from="footer"><svg data-icon="code"></svg>GitHub</a>
+      <a href="https://github.com/admonish/dapload/issues" data-event="github_clicked" data-event-from="footer"><svg data-icon="alert"></svg>Report an issue</a>
+      <a href="https://github.com/admonish/dapload/blob/main/LICENSE" data-event="github_clicked" data-event-from="footer"><svg data-icon="shield"></svg>MIT License</a>
+      <a href="demo/" data-event="demo_used" data-event-control="full_screen"><svg data-icon="external"></svg>Demo, full screen</a>
       <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener"><svg data-icon="coffee"></svg>Support this project</a>
     </div>
   </div>
