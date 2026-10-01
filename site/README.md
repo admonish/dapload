@@ -46,3 +46,9 @@ The demo only ever reads `file.name` and `file.size`. Its state is kept in `sess
 ### Custom analytics events
 
 `analytics.mjs` lists the events and funnels: `demo_used` (the first demo interaction in a page view), `install_copied` (a Copy button in Install) and `github_clicked`, with the funnel `demo_to_install`. The owner's analytics dashboard reads them from `/analytics-events.json`, which the build writes from the same file. To track a click, add `data-event="<name>"` and `data-event-<prop>="<value>"` to the element; `site.js` sends it through `window.va`, and the build fails if the event, property or value isn't in `analytics.mjs` (or if the number of tracked elements changes without updating the count in `build.mjs`). The first click inside the demo app is sent from `site.js` (`demo.onLoad`). Never rename an event or property; add a new one instead. Every event and funnel needs a short `label`, which the dashboard shows.
+
+## Email
+
+dapload.com sends and receives no email. Its DNS (at Vercel) says so, so nobody can send mail that passes as
+`@dapload.com` (added 2026-10-01): root TXT `v=spf1 -all` and `_dmarc` TXT `v=DMARC1; p=reject`. If the site ever
+sends mail (e.g. via Resend), replace both first.
