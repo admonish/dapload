@@ -44,6 +44,7 @@
   <link rel="stylesheet" href="site.css">
 </head>
 <body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="topbar">
   <div class="wrap topbar-in">
@@ -62,7 +63,7 @@
   </div>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 
 <!-- 1. Hero -->
 <section class="hero">
@@ -347,7 +348,7 @@ volumes:
         <ol class="steps">
           <li><div>On the player, open <b>WiFi Transfer</b>.<p>It shows an address like <code>http://192.168.1.23:8888</code>.</p></div></li>
           <li><div>Open <code>http://&lt;the machine running this&gt;:8899</code> in a browser.</div></li>
-          <li><div>Enter the player’s address when asked.<p>It’s remembered. If the player’s IP changes later, update it from the <span class="inline-icon" aria-label="settings"><svg data-icon="settings"></svg></span> button or the “can’t reach” screen.</p></div></li>
+          <li><div>Enter the player’s address when asked.<p>It’s remembered. If the player’s IP changes later, update it from the <span class="inline-icon" role="img" aria-label="settings"><svg data-icon="settings"></svg></span> button or the “can’t reach” screen.</p></div></li>
         </ol>
       </div>
     </div>
@@ -374,7 +375,7 @@ volumes:
           <li><b>No free-space figure.</b> The player doesn’t report capacity, so the “≈ used” number is calculated by adding up file sizes.</li>
           <li><b>Only certain file types are accepted.</b> The player silently drops anything else, so the app filters those files out up front and tells you.</li>
         </ul>
-        <div class="types" aria-label="Accepted file types">
+        <div class="types" role="group" aria-label="Accepted file types">
           <span class="chip">ISO</span><span class="chip">DFF</span><span class="chip">DSF</span><span class="chip">APE</span><span class="chip">FLAC</span><span class="chip">AIF(F)</span><span class="chip">WAV</span><span class="chip">M4A</span><span class="chip">AAC</span><span class="chip">MP2</span><span class="chip">AC3</span><span class="chip">DTS</span><span class="chip">MP3</span><span class="chip">OGG</span><span class="chip">WMA</span><span class="chip">CUE</span><span class="chip">M3U(8)</span><span class="chip">PNG</span><span class="chip">JPG</span><span class="chip">LRC</span><span class="chip">BIN</span>
         </div>
       </div>

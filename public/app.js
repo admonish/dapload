@@ -160,6 +160,39 @@ $("#theme-toggle").addEventListener("click", () => {
   setTheme(!document.documentElement.classList.contains("dark"));
 });
 
+// ---------- dialogs ----------
+// Opening a dialog moves focus into it and keeps Tab inside it; closing it
+// puts focus back on whatever opened it. Escape is handled per dialog.
+const FOCUSABLE = 'a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+function focusablesIn(el) {
+  return Array.from(el.querySelectorAll(FOCUSABLE)).filter((f) => f.offsetParent !== null);
+}
+function openDialog(backdrop, focusTarget) {
+  if (backdrop.classList.contains("hidden")) backdrop.returnFocus = document.activeElement;
+  backdrop.classList.remove("hidden");
+  setTimeout(() => {
+    const f = (typeof focusTarget === "string" ? $(focusTarget) : focusTarget) || focusablesIn(backdrop)[0];
+    if (f) { f.focus(); if (f.select && f.tagName === "INPUT") f.select(); }
+  }, 0);
+}
+function closeDialog(backdrop) {
+  if (backdrop.classList.contains("hidden")) return;
+  backdrop.classList.add("hidden");
+  const back = backdrop.returnFocus;
+  backdrop.returnFocus = null;
+  if (back && back.isConnected && back.offsetParent !== null) back.focus();
+}
+document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+  backdrop.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const items = focusablesIn(backdrop);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !backdrop.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+});
+
 // ---------- modal (replaces confirm()/prompt()) ----------
 function modal({ title, bodyHtml, confirmLabel = "OK", danger = false, onConfirm, focusSelector }) {
   const backdrop = $("#modal-backdrop");
@@ -168,10 +201,9 @@ function modal({ title, bodyHtml, confirmLabel = "OK", danger = false, onConfirm
   const confirmBtn = $("#modal-confirm");
   confirmBtn.textContent = confirmLabel;
   confirmBtn.className = "btn " + (danger ? "btn-danger" : "btn-primary");
-  backdrop.classList.remove("hidden");
 
   const close = () => {
-    backdrop.classList.add("hidden");
+    closeDialog(backdrop);
     confirmBtn.removeEventListener("click", onOk);
     $("#modal-cancel").removeEventListener("click", onCancel);
     backdrop.removeEventListener("keydown", onKey);
@@ -180,18 +212,15 @@ function modal({ title, bodyHtml, confirmLabel = "OK", danger = false, onConfirm
   const onCancel = () => close();
   const onKey = (e) => {
     if (e.key === "Escape") onCancel();
-    if (e.key === "Enter" && document.activeElement.tagName !== "TEXTAREA") onOk();
+    // Enter in a text field confirms; on a button it just presses that button.
+    if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); onOk(); }
   };
   confirmBtn.addEventListener("click", onOk);
   $("#modal-cancel").addEventListener("click", onCancel);
   backdrop.addEventListener("keydown", onKey);
 
-  if (focusSelector) {
-    setTimeout(() => {
-      const f = $(focusSelector);
-      if (f) { f.focus(); f.select && f.select(); }
-    }, 0);
-  }
+  // Without a field to fill in, start on Cancel so Enter can't delete by accident.
+  openDialog(backdrop, focusSelector || "#modal-cancel");
 }
 
 // ---------- config ----------
@@ -259,7 +288,7 @@ $("#device-form").addEventListener("submit", (e) => {
 $("#settings-btn").addEventListener("click", () => {
   modal({
     title: "Device address",
-    bodyHtml: `Shown on the player's WiFi Transfer screen.<input type="text" id="settings-device-input" class="input mono" placeholder="e.g. 192.168.1.23:8888" spellcheck="false">
+    bodyHtml: `Shown on the player's WiFi Transfer screen.<input type="text" id="settings-device-input" class="input mono" placeholder="e.g. 192.168.1.23:8888" spellcheck="false" aria-label="Device address">
       <div class="about">Dapload is made by Thomas. Free and ad-free. If it's worth something to you, you can <a href="${SUPPORT_URL}" target="_blank" rel="noopener">buy me a coffee</a>.<br>Unofficial. Not affiliated with or endorsed by Shanling.</div>`,
     confirmLabel: "Save",
     focusSelector: "#settings-device-input",
@@ -326,7 +355,10 @@ function renderCrumbs(el, crumbs, onClick, includeCurrent) {
     const node = document.createElement(isCurrent ? "span" : "a");
     node.textContent = label;
     if (isCurrent) node.className = "current";
-    else node.addEventListener("click", () => onClick(path));
+    else {
+      node.href = "#";
+      node.addEventListener("click", (e) => { e.preventDefault(); onClick(path); });
+    }
     el.appendChild(node);
   });
   if (!includeCurrent && shown.length) el.appendChild(svgIcon("chevron", "sep"));
@@ -399,6 +431,7 @@ function renderRow(entry, number) {
   checkbox.type = "checkbox";
   checkbox.className = "checkbox";
   checkbox.title = "Select";
+  checkbox.setAttribute("aria-label", `Select ${entry.name}`);
   checkbox.style.visibility = home ? "hidden" : "visible";
   checkbox.checked = selected.has(entry.path);
   row.classList.toggle("selected", checkbox.checked);
@@ -414,10 +447,12 @@ function renderRow(entry, number) {
 
   const nameCell = document.createElement("div");
   nameCell.className = "name-cell";
-  const nameEl = document.createElement("span");
+  // A folder's name is a link, so keyboard and screen reader users can open it.
+  const nameEl = document.createElement(isFolder ? "a" : "span");
   nameEl.className = "name";
   nameEl.textContent = entry.name;
   nameEl.title = entry.name;
+  if (isFolder) nameEl.href = "#";
   const sub = document.createElement("span");
   sub.className = "sub";
   sub.textContent = [isFolder ? "" : formatSize(entry.size), formatDate(entry.ctime)].filter(Boolean).join(" · ");
@@ -436,16 +471,15 @@ function renderRow(entry, number) {
 
   if (isFolder) {
     // The whole row opens the folder (except its checkbox and buttons).
-    row.tabIndex = 0;
     row.addEventListener("click", (e) => {
-      if (!e.target.closest("input, button")) navigate(entry.path);
-    });
-    row.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && e.target === row) navigate(entry.path);
+      if (e.target.closest("input, button")) return;
+      e.preventDefault();
+      navigate(entry.path);
     });
   } else {
     const dl = document.createElement("button");
     dl.title = "Download";
+    dl.setAttribute("aria-label", `Download ${entry.name}`);
     dl.appendChild(svgIcon("download"));
     dl.addEventListener("click", () => {
       window.location = "download?path=" + encodeURIComponent(entry.path);
@@ -457,6 +491,7 @@ function renderRow(entry, number) {
     const del = document.createElement("button");
     del.className = "delete-btn";
     del.title = "Delete";
+    del.setAttribute("aria-label", `Delete ${entry.name}`);
     del.appendChild(svgIcon("trash"));
     del.addEventListener("click", () => confirmDelete([entry]));
     actions.appendChild(del);
@@ -525,6 +560,8 @@ async function navigate(path) {
   filterInput.value = "";
   filterText = "";
   await refresh();
+  // The link that was used is gone after re-rendering; continue from the folder title.
+  if (!document.activeElement || document.activeElement === document.body) $("#folder-title").focus();
 }
 
 // The device only runs its web server while "WiFi Transfer" is open on
@@ -624,12 +661,12 @@ $("#new-folder-btn").addEventListener("click", () => {
   if (isRoot(currentPath)) { toast("No permission to create folders here", true); return; }
   modal({
     title: "New folder",
-    bodyHtml: `<input type="text" id="new-folder-input" value="New Folder">`,
+    bodyHtml: `<input type="text" id="new-folder-input" value="New Folder" aria-label="Folder name">`,
     confirmLabel: "Create",
     focusSelector: "#new-folder-input",
     onConfirm: async () => {
       const name = $("#new-folder-input").value.trim();
-      if (!name) return;
+      if (!name) { toast("The folder needs a name. Try again and type one.", true); return; }
       try {
         await apiForm("create", { path: currentPath + name });
         toast(`Created "${name}"`);
@@ -1100,12 +1137,12 @@ function openLibraryModal() {
   $("#library-listing").innerHTML = "";
   $("#library-breadcrumb").innerHTML = "";
   updateLibrarySelectedCount();
-  $("#library-modal-backdrop").classList.remove("hidden");
+  openDialog($("#library-modal-backdrop"), "#library-cancel");
   navigateLibrary("");
 }
 
 function closeLibraryModal() {
-  $("#library-modal-backdrop").classList.add("hidden");
+  closeDialog($("#library-modal-backdrop"));
 }
 
 async function navigateLibrary(relPath) {
@@ -1134,6 +1171,12 @@ async function navigateLibrary(relPath) {
   $("#library-listing").classList.toggle("hidden", !errorEl.classList.contains("hidden"));
   renderLibraryBreadcrumb();
   renderLibraryListing();
+  // Keep keyboard focus inside the dialog when the link that was used is re-rendered away.
+  const backdrop = $("#library-modal-backdrop");
+  if (!backdrop.classList.contains("hidden") && !backdrop.contains(document.activeElement)) {
+    const first = focusablesIn($("#library-listing"))[0] || focusablesIn(errorEl)[0] || $("#library-cancel");
+    first.focus();
+  }
 }
 
 function renderLibraryBreadcrumb() {
@@ -1163,6 +1206,7 @@ function renderLibraryListing() {
     checkbox.type = "checkbox";
     checkbox.className = "checkbox";
     checkbox.title = "Select";
+    checkbox.setAttribute("aria-label", `Select ${entry.name}`);
     checkbox.checked = librarySelected.has(entry.path);
     row.classList.toggle("selected", checkbox.checked);
     checkbox.addEventListener("change", () => {
@@ -1172,14 +1216,18 @@ function renderLibraryListing() {
       updateLibrarySelectedCount();
     });
 
-    const nameEl = document.createElement("span");
+    // A folder's name is a link, so keyboard and screen reader users can open it.
+    const nameEl = document.createElement(isFolder ? "a" : "span");
     nameEl.className = "name";
     nameEl.textContent = entry.name;
     nameEl.title = entry.name;
     if (isFolder) {
-      row.tabIndex = 0;
-      row.addEventListener("click", (e) => { if (e.target !== checkbox) navigateLibrary(entry.path); });
-      row.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === row) navigateLibrary(entry.path); });
+      nameEl.href = "#";
+      row.addEventListener("click", (e) => {
+        if (e.target === checkbox) return;
+        e.preventDefault();
+        navigateLibrary(entry.path);
+      });
     }
 
     const size = document.createElement("span");
@@ -1274,12 +1322,11 @@ function openLibrarySetup() {
   setupConnectBtn.disabled = !config.smbAvailable;
   setupError.classList.add("hidden");
   setPasswordVisible(false);
-  setupBackdrop.classList.remove("hidden");
-  setTimeout(() => $("#ls-address").focus(), 0);
+  openDialog(setupBackdrop, "#ls-address");
 }
 
 function closeLibrarySetup() {
-  setupBackdrop.classList.add("hidden");
+  closeDialog(setupBackdrop);
 }
 
 $("#library-setup-form").addEventListener("submit", async (e) => {

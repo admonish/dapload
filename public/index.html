@@ -83,17 +83,17 @@
 
     <main class="content">
       <div class="content-head">
-        <nav id="breadcrumb" class="breadcrumb"></nav>
+        <nav id="breadcrumb" class="breadcrumb" aria-label="Folder path"></nav>
         <div class="title-row">
           <button id="up-btn" class="btn btn-icon" title="Up one folder"><svg data-icon="up"></svg></button>
           <div class="folder-title">
-            <h2 id="folder-title"></h2>
+            <h2 id="folder-title" tabindex="-1"></h2>
             <span id="folder-count" class="folder-count"></span>
           </div>
           <div class="list-tools">
             <label class="input-wrap filter-wrap">
               <svg data-icon="search"></svg>
-              <input type="search" id="filter-input" class="input" placeholder="Filter this folder&hellip;">
+              <input type="search" id="filter-input" class="input" placeholder="Filter this folder&hellip;" aria-label="Filter this folder">
             </label>
             <label class="input-wrap select-wrap">
               <svg data-icon="sort"></svg>
@@ -160,10 +160,10 @@
     </main>
   </div>
 
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
 
   <div id="modal-backdrop" class="modal-backdrop hidden">
-    <div class="modal modal-small">
+    <div class="modal modal-small" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-body">
       <div class="modal-content">
         <div id="modal-title" class="modal-title"></div>
         <div id="modal-body" class="modal-body"></div>
@@ -176,15 +176,15 @@
   </div>
 
   <div id="library-modal-backdrop" class="modal-backdrop hidden">
-    <div class="modal library-modal">
+    <div class="modal library-modal" role="dialog" aria-modal="true" aria-labelledby="library-modal-title">
       <div class="modal-head">
         <svg data-icon="library" class="modal-head-icon"></svg>
         <div id="library-modal-title" class="modal-title">Add from library</div>
         <button id="library-settings-btn" class="link-btn hidden"><svg data-icon="settings"></svg>Connection settings</button>
       </div>
-      <nav id="library-breadcrumb" class="breadcrumb library-breadcrumb"></nav>
+      <nav id="library-breadcrumb" class="breadcrumb library-breadcrumb" aria-label="Library folder path"></nav>
       <div id="library-listing" class="library-listing"></div>
-      <div id="library-error" class="library-error hidden"></div>
+      <div id="library-error" class="library-error hidden" role="alert"></div>
       <div class="modal-actions">
         <span id="library-selected-count" class="library-selected-count"></span>
         <button id="library-cancel" class="btn">Cancel</button>
@@ -194,10 +194,10 @@
   </div>
 
   <div id="library-setup-backdrop" class="modal-backdrop hidden">
-    <form id="library-setup-form" class="modal library-setup" autocomplete="off">
+    <form id="library-setup-form" class="modal library-setup" autocomplete="off" role="dialog" aria-modal="true" aria-labelledby="library-setup-title">
       <div class="modal-head">
         <svg data-icon="nas" class="modal-head-icon"></svg>
-        <div class="modal-title">Connect a music library</div>
+        <div id="library-setup-title" class="modal-title">Connect a music library</div>
       </div>
       <div class="modal-content">
         <p class="setup-intro">Copy music from a NAS or shared network folder straight to your player. Files go directly from the share to the player without passing through this browser.</p>
@@ -217,7 +217,7 @@
           </label>
         </div>
         <label class="field"><span class="caps-label">Show it as</span><input type="text" id="ls-name" class="input" placeholder="NAS"></label>
-        <div id="library-setup-error" class="form-error hidden"><svg data-icon="alert"></svg><span id="library-setup-error-text"></span></div>
+        <div id="library-setup-error" class="form-error hidden" role="alert"><svg data-icon="alert"></svg><span id="library-setup-error-text"></span></div>
         <p class="setup-footnote">The share is only read, never changed. The password is saved on the server running this app. Anyone who can open this page can browse the share, so only use this on a network you trust.</p>
       </div>
       <div class="modal-actions">
