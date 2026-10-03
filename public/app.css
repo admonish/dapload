@@ -351,6 +351,9 @@ html.dark .btn-primary:hover:not(:disabled) { filter: brightness(1.07); }
 .support-link:hover { color: var(--accent-text); }
 .support-link svg[data-icon] { width: 15px; height: 15px; stroke-width: 1.6; }
 
+/* With the support link hidden, the tools keep their place at the bottom. */
+:where(.support-link.hidden) + .side-tools { margin-top: auto; }
+
 .side-tools {
   display: flex;
   gap: 4px;

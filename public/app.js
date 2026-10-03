@@ -289,7 +289,7 @@ $("#settings-btn").addEventListener("click", () => {
   modal({
     title: "Device address",
     bodyHtml: `Shown on the player's WiFi Transfer screen.<input type="text" id="settings-device-input" class="input mono" placeholder="e.g. 192.168.1.23:8888" spellcheck="false" aria-label="Device address">
-      <div class="about">Dapload is made by Thomas. Free and ad-free. If it's worth something to you, you can <a href="${SUPPORT_URL}" target="_blank" rel="noopener">buy me a coffee</a>.<br>Unofficial. Not affiliated with or endorsed by Shanling.</div>`,
+      <div class="about">Dapload is made by Thomas. Free and ad-free.${SUPPORT_URL ? ` If it's worth something to you, you can <a href="${SUPPORT_URL}" target="_blank" rel="noopener">buy me a coffee</a>.` : ""}<br>Unofficial. Not affiliated with or endorsed by Shanling.</div>`,
     confirmLabel: "Save",
     focusSelector: "#settings-device-input",
     onConfirm: () => saveDeviceAddress($("#settings-device-input").value),
@@ -734,11 +734,21 @@ async function alreadyAtDestination(destDir, filename, size) {
 // One quiet line in the dock after a batch that transferred something, at
 // most once per session. Dismissing it hides it for 30 days. It never
 // blocks anything; see the shared support-model guidelines.
-const SUPPORT_URL = "https://ko-fi.com/thomasjohnsrud";
+// Paused while the owner's side-business approval is pending: an empty URL
+// hides every support link. Set it back to "https://ko-fi.com/thomasjohnsrud"
+// to restore them.
+const SUPPORT_URL = "";
 const SUPPORT_SNOOZE_MS = 30 * 24 * 60 * 60 * 1000;
 
+if (SUPPORT_URL) {
+  document.querySelectorAll("[data-support]").forEach((a) => {
+    a.href = SUPPORT_URL;
+    a.classList.remove("hidden");
+  });
+}
+
 function supportPromptDue() {
-  if (sessionStorage.getItem("supportShown")) return false;
+  if (!SUPPORT_URL || sessionStorage.getItem("supportShown")) return false;
   return Date.now() > Number(localStorage.getItem("supportDismissedUntil") || 0);
 }
 

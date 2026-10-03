@@ -106,5 +106,3 @@ The details of the player's API and its firmware quirks are in [docs/device-api.
 The code is [MIT](LICENSE)-licensed. The Dapload name isn't covered by the license, so please use a different name for your own fork.
 
 Dapload is an unofficial community project. It is not affiliated with or endorsed by Shanling.
-
-If Dapload is useful to you, you can [buy me a coffee](https://ko-fi.com/thomasjohnsrud).
