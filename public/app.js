@@ -734,10 +734,8 @@ async function alreadyAtDestination(destDir, filename, size) {
 // One quiet line in the dock after a batch that transferred something, at
 // most once per session. Dismissing it hides it for 30 days. It never
 // blocks anything; see the shared support-model guidelines.
-// Paused while the owner's side-business approval is pending: an empty URL
-// hides every support link. Set it back to "https://ko-fi.com/thomasjohnsrud"
-// to restore them.
-const SUPPORT_URL = "";
+// An empty URL hides every support link (side panel, about line, dock prompt).
+const SUPPORT_URL = "https://ko-fi.com/thomasjohnsrud";
 const SUPPORT_SNOOZE_MS = 30 * 24 * 60 * 60 * 1000;
 
 if (SUPPORT_URL) {

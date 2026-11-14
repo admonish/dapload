@@ -270,7 +270,7 @@
         <div class="tab-panel" id="panel-docker" role="tabpanel" aria-labelledby="tab-docker">
           <div class="code">
             <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-docker" data-event="install_copied" data-event-method="docker"><svg data-icon="copy"></svg><span>Copy</span></button></div>
-<pre id="code-docker"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
+<pre id="code-docker" tabindex="0"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
   -p 8899:8899 \
   -v dapload-data:/data \
   ghcr.io/admonish/dapload:latest</pre>
@@ -282,7 +282,7 @@
               <p>If the music is on the machine running the app, or you’ve already mounted the share there, point the app at the folder. This also works for NFS shares.</p>
               <div class="code">
                 <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-local" data-event="install_copied" data-event-method="docker_local"><svg data-icon="copy"></svg><span>Copy</span></button></div>
-<pre id="code-local"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
+<pre id="code-local" tabindex="0"><span class="p">$ </span>docker run -d --name dapload --restart unless-stopped \
   -p 8899:8899 \
   -v dapload-data:/data \
   -v /path/to/music:/music:ro \
@@ -298,7 +298,7 @@
         <div class="tab-panel" id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" hidden>
           <div class="code">
             <div class="code-head">docker-compose.yml<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose" data-event="install_copied" data-event-method="compose"><svg data-icon="copy"></svg><span>Copy</span></button></div>
-<pre id="code-compose">services:
+<pre id="code-compose" tabindex="0">services:
   dapload:
     image: ghcr.io/admonish/dapload:latest
     <span class="c"># or build from source instead:</span>
@@ -325,7 +325,7 @@ volumes:
           </div>
           <div class="code">
             <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-compose-up" data-event="install_copied" data-event-method="compose_up"><svg data-icon="copy"></svg><span>Copy</span></button></div>
-<pre id="code-compose-up"><span class="p">$ </span>docker compose up -d</pre>
+<pre id="code-compose-up" tabindex="0"><span class="p">$ </span>docker compose up -d</pre>
           </div>
           <div class="arch">Images for <span class="chip">amd64</span><span class="chip">arm64</span><span class="chip">armv7</span></div>
         </div>
@@ -334,7 +334,7 @@ volumes:
           <p>You need Python 3.8 or newer.</p>
           <div class="code">
             <div class="code-head">terminal<span class="spacer"></span><button class="copy-btn" type="button" data-copy="code-python" data-event="install_copied" data-event-method="python"><svg data-icon="copy"></svg><span>Copy</span></button></div>
-<pre id="code-python"><span class="p">$ </span>git clone https://github.com/admonish/dapload.git
+<pre id="code-python" tabindex="0"><span class="p">$ </span>git clone https://github.com/admonish/dapload.git
 <span class="p">$ </span>cd dapload
 <span class="p">$ </span>pip install -r requirements.txt   <span class="c"># optional, only needed for connecting a NAS</span>
 <span class="p">$ </span>python3 proxy.py</pre>
@@ -439,13 +439,14 @@ volumes:
     <div>
       <a class="brand" href="#top"><span class="led on" aria-hidden="true"></span>Dapload</a>
       <p>An unofficial community project. Not affiliated with or endorsed by Shanling. Shanling and M1 Plus are trademarks of their respective owner.</p>
-      <p>Made by Thomas. Free and ad-free.</p>
+      <p>Made by Thomas. Free and ad-free. If it’s worth something to you, you can <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener">buy me a coffee</a>.</p>
     </div>
     <div class="foot-links">
       <a href="https://github.com/admonish/dapload" data-event="github_clicked" data-event-from="footer"><svg data-icon="code"></svg>GitHub</a>
       <a href="https://github.com/admonish/dapload/issues" data-event="github_clicked" data-event-from="footer"><svg data-icon="alert"></svg>Report an issue</a>
       <a href="https://github.com/admonish/dapload/blob/main/LICENSE" data-event="github_clicked" data-event-from="footer"><svg data-icon="shield"></svg>MIT License</a>
       <a href="demo/" data-event="demo_used" data-event-control="full_screen"><svg data-icon="external"></svg>Demo, full screen</a>
+      <a href="https://ko-fi.com/thomasjohnsrud" target="_blank" rel="noopener"><svg data-icon="coffee"></svg>Support this project</a>
     </div>
   </div>
 </footer>
